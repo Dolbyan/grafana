@@ -1,6 +1,7 @@
 import os
 import time
 import psycopg2
+
 from flask import Flask, request, jsonify, Response
 from psycopg2 import DatabaseError
 from prometheus_client import start_http_server, Summary, Counter, generate_latest, CollectorRegistry, Histogram
@@ -164,7 +165,9 @@ def delete(id):
         return jsonify({"error":"Database error occurred"}), 500
 
 
+
 if __name__ == "__main__":
+    unittest.main()
     app.run(host='0.0.0.0', port=80, debug=True)
 # try:
 #         conn = db_connection()
