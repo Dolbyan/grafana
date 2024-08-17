@@ -4,7 +4,7 @@ from flask import Flask
 from app import app, REQUEST_COUNT, ERROR_RATE, PASS_RATE, REQUEST_LATENCY, REGISTRY
 
 class TestCrud(unittest.TestCase):
-    def set_up(self):
+    def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
 
