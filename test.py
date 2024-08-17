@@ -24,27 +24,27 @@ class TestCrud(unittest.TestCase):
     def test_error_endpoint(self):
         response = self.app.get("/get")
         self.assertEqual(response.status_code, 500)
-        self.assertIn(b"Error endpoint", response.data)
+        self.assertIn(b"Error", response.data)
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
         self.assertEqual(ERROR_RATE._value.get(), 1)
 
     def test_timeout_endpoint(self):
         response = self.app.get('/timeout')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'timeout endpoint', response.data)
+        self.assertIn(b'End after 2sec', response.data)
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
         self.assertEqual(PASS_RATE._value.get(), 1)
     def test_timeout5_endpoint(self):
         response = self.app.get('/timeout5')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'timeout5 endpoint', response.data)
+        self.assertIn(b'End after 5sec', response.data)
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
         self.assertEqual(PASS_RATE._value.get(), 1)
 
     def test_mstimeout_endpoint(self):
         response = self.app.get('/mstimeout')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Latency endpoint', response.data)
+        self.assertIn(b'End after 20ms', response.data)
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
         self.assertEqual(PASS_RATE._value.get(), 1)
 
