@@ -167,7 +167,6 @@ def delete(id):
 
 
 if __name__ == "__main__":
-    unittest.main()
     app.run(host='0.0.0.0', port=80, debug=True)
 # try:
 #         conn = db_connection()
