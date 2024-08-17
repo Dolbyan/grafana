@@ -24,7 +24,7 @@ class TestCrud(unittest.TestCase):
     def test_error_endpoint(self):
         response = self.app.get("/get")
         self.assertEqual(response.status_code, 500)
-        self.assertIn(b"Error", response.data)
+        self.assertIn(b"Database error occurred", response.data)
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
         self.assertEqual(ERROR_RATE._value.get(), 1)
 

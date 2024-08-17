@@ -36,7 +36,7 @@ def metrics():
 def error():
     REQUEST_COUNT.inc()
     ERROR_RATE.inc()
-    return jsonify({"message":"Error"}), 500
+    return jsonify({"message":"Database error occurred"}), 500
 
 @app.route("/latency", methods=["GET"])
 def latency():
