@@ -120,7 +120,8 @@ def ms_timeout():
 def db_connection():
     """Create a connection to the database."""
     conn = psycopg2.connect(
-        host=os.getenv("DB_HOST", "host.docker.internal"),
+        # host=os.getenv("DB_HOST", "host.docker.internal"),
+        host=os.getenv("DB_HOST", "localhost"),
         database=os.getenv("DB_NAME", "microservices"),
         user=os.getenv("DB_USER", "postgres"),
         password=os.getenv("DB_PASSWORD", "bikeshop")

@@ -10,9 +10,14 @@ class TestCrud(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-        self.reset_metric = REQUEST_COUNT._value.get if hasattr(REQUEST_COUNT, '_value') else lambda: 0
-        self.get_error_rate = ERROR_RATE._value.get if hasattr(ERROR_RATE, '_value') else lambda: 0
-        self.get_pass_rate = PASS_RATE._value.get if hasattr(PASS_RATE, '_value') else lambda: 0
+        REQUEST_COUNT._value.set(0)
+        ERROR_RATE._value.set(0)
+        PASS_RATE._value.set(0)
+
+        # Funkcje do uzyskiwania wartości
+        self.reset_metric = lambda: REQUEST_COUNT._value.get()
+        self.get_error_rate = lambda: ERROR_RATE._value.get()
+        self.get_pass_rate = lambda: PASS_RATE._value.get()
 
     def test_latency_endpoint(self):
         """Test latency endpoint."""
