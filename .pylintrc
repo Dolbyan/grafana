@@ -2,7 +2,7 @@
 ignore=tests
 
 [MESSAGES CONTROL]
-disable=C0114, C0116, W0718, W0212, invalid-name, missing-module-docstring, line-too-long
+disable=C0114, C0116, W0718, W0212, W0108, invalid-name, missing-module-docstring, line-too-long
 
 [FORMAT]
 max-line-length=120
