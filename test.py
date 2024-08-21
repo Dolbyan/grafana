@@ -59,10 +59,11 @@ class TestCrud(unittest.TestCase):
     def test_get_endpoint(self, mock_db_connection):
 
         mock_db_connection.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = [
-            (1, 16)]
+            (1, 16)
+        ]
         response = self.app.get('/get')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json(), [(1, 16)])
+        self.assertEqual(response.get_json(), [[1, 16]])
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
         self.assertEqual(PASS_RATE._value.get(), 1)
 
