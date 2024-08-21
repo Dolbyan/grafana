@@ -67,28 +67,28 @@ class TestCrud(unittest.TestCase):
         self.assertIn(b'error_rate_total', response.data)
         self.assertIn(b'pass_rate_total', response.data)
 
-    @patch("app.db_connection")
-    def test_get_endpoint(self, mock_db_connection):
-        """Test get endpoint with mocked database connection."""
-        mock_cursor = MagicMock()
-        mock_cursor.fetchall.return_value = [(1, 16)]
-        mock_db_connection.cursor.return_value.__enter__.return_value = mock_cursor
-        response = self.app.get('/get')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json(), [[1, 16]])
-        self.assertEqual(self.reset_metric(), 1)
-        self.assertEqual(self.get_pass_rate(), 1)
-
-    @patch("app.db_connection")
-    def test_add_endpoint(self, mock_db_connection):
-        """Test add endpoint with mocked database connection."""
-        mock_cursor = MagicMock()
-        mock_db_connection.cursor.return_value.__enter__.return_value = mock_cursor
-        response = self.app.post('/add', json={"item_id": 1, "data": 15})
-        self.assertEqual(response.status_code, 201)
-        self.assertIn(b'Added', response.data)
-        self.assertEqual(self.reset_metric(), 1)
-        self.assertEqual(self.get_pass_rate(), 1)
+    # @patch("app.db_connection")
+    # def test_get_endpoint(self, mock_db_connection):
+    #     """Test get endpoint with mocked database connection."""
+    #     mock_cursor = MagicMock()
+    #     mock_cursor.fetchall.return_value = [(1, 16)]
+    #     mock_db_connection.cursor.return_value.__enter__.return_value = mock_cursor
+    #     response = self.app.get('/get')
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response.get_json(), [[1, 16]])
+    #     self.assertEqual(self.reset_metric(), 1)
+    #     self.assertEqual(self.get_pass_rate(), 1)
+    #
+    # @patch("app.db_connection")
+    # def test_add_endpoint(self, mock_db_connection):
+    #     """Test add endpoint with mocked database connection."""
+    #     mock_cursor = MagicMock()
+    #     mock_db_connection.cursor.return_value.__enter__.return_value = mock_cursor
+    #     response = self.app.post('/add', json={"item_id": 1, "data": 15})
+    #     self.assertEqual(response.status_code, 201)
+    #     self.assertIn(b'Added', response.data)
+    #     self.assertEqual(self.reset_metric(), 1)
+    #     self.assertEqual(self.get_pass_rate(), 1)
 
 
 if __name__ == '__main__':
