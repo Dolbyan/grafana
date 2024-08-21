@@ -83,9 +83,6 @@ class TestCrud(unittest.TestCase):
         mock_cursor = MagicMock()
         mock_cursor.fetchall.return_value = [(1, 16)]
         mock_db_connection.cursor.return_value.__enter__.return_value = mock_cursor
-        # mock_db_connection.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = [
-        #     (1, 16)
-        # ]
         response = self.app.get('/get')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), [[1, 16]])
