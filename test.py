@@ -3,7 +3,9 @@ from unittest.mock import patch, MagicMock
 from app import app, REQUEST_COUNT, ERROR_RATE, PASS_RATE
 
 class TestCrud(unittest.TestCase):
+    """Test case for CRUD operations and metrics endpoints."""
     def setUp(self):
+        """Set up test client and reset metrics."""
         self.app = app.test_client()
         self.app.testing = True
 
@@ -13,6 +15,7 @@ class TestCrud(unittest.TestCase):
             PASS_RATE._value.set(0)
 
     def test_latency_endpoint(self):
+        """Test latency endpoint."""
         response = self.app.get('/latency')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Latency endpoint', response.data)
@@ -20,6 +23,7 @@ class TestCrud(unittest.TestCase):
 
 
     def test_error_endpoint(self):
+        """Test error endpoint."""
         response = self.app.get("/get")
         self.assertEqual(response.status_code, 500)
         self.assertIn(b"Database error occurred", response.data)
@@ -27,6 +31,7 @@ class TestCrud(unittest.TestCase):
         self.assertEqual(ERROR_RATE._value.get(), 1)
 
     def test_timeout_endpoint(self):
+        """Test timeout endpoint."""
         response = self.app.get('/timeout')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'End after 2sec', response.data)
@@ -34,6 +39,7 @@ class TestCrud(unittest.TestCase):
         self.assertEqual(PASS_RATE._value.get(), 1)
 
     def test_timeout5_endpoint(self):
+        """Test timeout5 endpoint."""
         response = self.app.get('/timeout5')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'End after 5sec', response.data)
@@ -41,6 +47,7 @@ class TestCrud(unittest.TestCase):
         self.assertEqual(PASS_RATE._value.get(), 1)
 
     def test_mstimeout_endpoint(self):
+        """Test ms timeout endpoint."""
         response = self.app.get('/mstimeout')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'End after 20ms', response.data)
@@ -48,6 +55,7 @@ class TestCrud(unittest.TestCase):
         self.assertEqual(PASS_RATE._value.get(), 1)
 
     def test_metrics_endpoint(self):
+        """Test metrics endpoint."""
         response = self.app.get('/metrics')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'request_latency_seconds_count', response.data)
@@ -57,7 +65,7 @@ class TestCrud(unittest.TestCase):
 
     @patch("app.db_connection")
     def test_get_endpoint(self, mock_db_connection):
-
+        """Test get endpoint with mocked database connection."""
         mock_db_connection.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = [
             (1, 16)
         ]
@@ -69,7 +77,7 @@ class TestCrud(unittest.TestCase):
 
     @patch("app.db_connection")
     def test_add_endpoint(self, mock_db_connection):
-
+        """Test add endpoint with mocked database connection."""
         mock_db_connection.return_value.cursor.return_value.__enter__.return_value = MagicMock()
         response = self.app.post('/add', json={"item_id": 1, "data": 15})
         self.assertEqual(response.status_code, 201)
