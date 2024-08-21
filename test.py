@@ -70,7 +70,7 @@ class TestCrud(unittest.TestCase):
     def test_add_endpoint(self, mock_db_connection):
 
         mock_db_connection.return_value.cursor.return_value.__enter__.return_value = MagicMock()
-        response = self.app.post('/add', json={"item_id":1, "data":"sample data"})
+        response = self.app.post('/add', json={"item_id": 1, "data": 15})
         self.assertEqual(response.status_code, 201)
         self.assertIn(b'Added', response.data)
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
