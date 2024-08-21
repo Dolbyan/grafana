@@ -168,15 +168,4 @@ def delete(id):
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
-# try:
-#         conn = db_connection()
-#         cur = conn.cursor()
-#         cur.execute("SELECT * FROM docker")
-#         data = cur.fetchall()
-#         cur.close()
-#         conn.close()
-#         return jsonify(data)
-#     except DatabaseError as e:
-#         # Log the error
-#         print(f"Database error: {e}")
-#         return jsonify({"error":"Database error occurred"}), 500
+

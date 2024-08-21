@@ -1,6 +1,5 @@
 import unittest
-import time
-from flask import Flask
+from unittest.mock import patch, MagicMock
 from app import app, REQUEST_COUNT, ERROR_RATE, PASS_RATE, REQUEST_LATENCY, REGISTRY
 
 class TestCrud(unittest.TestCase):
@@ -55,6 +54,27 @@ class TestCrud(unittest.TestCase):
         self.assertIn(b'request_count_total', response.data)
         self.assertIn(b'error_rate_total', response.data)
         self.assertIn(b'pass_rate_total', response.data)
+
+    @patch("app.db_connection")
+    def test_get_endpoint(self, mock_db_connection):
+
+        mock_db_connection.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = [
+            (1, 'sample data')]
+        response = self.app.get('/get')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), [(1, 'sample data')])
+        self.assertEqual(REQUEST_COUNT._value.get(), 1)
+        self.assertEqual(PASS_RATE._value.get(), 1)
+
+    @patch("app.db_connection")
+    def test_add_endpoint(self, mock_db_connection):
+
+        mock_db_connection.return_value.cursor.return_value.__enter__.return_value = MagicMock()
+        response = self.app.post('/add', json={"item_id":1, "data":"sample data"})
+        self.assertEqual(response.status_code, 201)
+        self.assertIn(b'Added', response.data)
+        self.assertEqual(REQUEST_COUNT._value.get(), 1)
+        self.assertEqual(PASS_RATE._value.get(), 1)
 
 if __name__ == '__main__':
     unittest.main()
