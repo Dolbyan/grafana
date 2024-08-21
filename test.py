@@ -34,39 +34,39 @@ class TestCrud(unittest.TestCase):
         response = self.app.get('/latency')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Latency endpoint', response.data)
-        self.assertEqual(REQUEST_COUNT._value.get(), 1)
+        self.assertEqual(self.reset_metric(), 1)
 
     def test_error_endpoint(self):
         """Test error endpoint."""
         response = self.app.get("/get")
         self.assertEqual(response.status_code, 500)
         self.assertIn(b"Database error occurred", response.data)
-        self.assertEqual(REQUEST_COUNT._value.get(), 1)
-        self.assertEqual(ERROR_RATE._value.get(), 1)
+        self.assertEqual(self.reset_metric(), 1)
+        self.assertEqual(self.get_error_rate(), 1)
 
     def test_timeout_endpoint(self):
         """Test timeout endpoint."""
         response = self.app.get('/timeout')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'End after 2sec', response.data)
-        self.assertEqual(REQUEST_COUNT._value.get(), 1)
-        self.assertEqual(PASS_RATE._value.get(), 1)
+        self.assertEqual(self.reset_metric(), 1)
+        self.assertEqual(self.get_pass_rate(), 1)
 
     def test_timeout5_endpoint(self):
         """Test timeout5 endpoint."""
         response = self.app.get('/timeout5')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'End after 5sec', response.data)
-        self.assertEqual(REQUEST_COUNT._value.get(), 1)
-        self.assertEqual(PASS_RATE._value.get(), 1)
+        self.assertEqual(self.reset_metric(), 1)
+        self.assertEqual(self.get_pass_rate(), 1)
 
     def test_mstimeout_endpoint(self):
         """Test ms timeout endpoint."""
         response = self.app.get('/mstimeout')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'End after 20ms', response.data)
-        self.assertEqual(REQUEST_COUNT._value.get(), 1)
-        self.assertEqual(PASS_RATE._value.get(), 1)
+        self.assertEqual(self.reset_metric(), 1)
+        self.assertEqual(self.get_pass_rate(), 1)
 
     def test_metrics_endpoint(self):
         """Test metrics endpoint."""
@@ -89,8 +89,8 @@ class TestCrud(unittest.TestCase):
         response = self.app.get('/get')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), [[1, 16]])
-        self.assertEqual(REQUEST_COUNT._value.get(), 1)
-        self.assertEqual(PASS_RATE._value.get(), 1)
+        self.assertEqual(self.reset_metric(), 1)
+        self.assertEqual(self.get_pass_rate(), 1)
 
     @patch("app.db_connection")
     def test_add_endpoint(self, mock_db_connection):
@@ -101,8 +101,8 @@ class TestCrud(unittest.TestCase):
         response = self.app.post('/add', json={"item_id": 1, "data": 15})
         self.assertEqual(response.status_code, 201)
         self.assertIn(b'Added', response.data)
-        self.assertEqual(REQUEST_COUNT._value.get(), 1)
-        self.assertEqual(PASS_RATE._value.get(), 1)
+        self.assertEqual(self.reset_metric(), 1)
+        self.assertEqual(self.get_pass_rate(), 1)
 
 
 if __name__ == '__main__':
