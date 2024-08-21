@@ -10,26 +10,11 @@ class TestCrud(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-        # Access metrics through public getters (if available)
-        if hasattr(REQUEST_COUNT, 'get'):
-            REQUEST_COUNT.set(0)  # Assuming a public set method exists
-            self.reset_metric = REQUEST_COUNT.get
-        else:
-            self.reset_metric = lambda: setattr(REQUEST_COUNT, '_value', 0)
+        self.reset_metric = lambda:REQUEST_COUNT._value.get()
+        self.get_error_rate = lambda:ERROR_RATE._value.get()
+        self.get_pass_rate = lambda:PASS_RATE._value.get()
 
-        if hasattr(ERROR_RATE, 'get'):
-            ERROR_RATE.set(0)
-            self.get_error_rate = ERROR_RATE.get
-        else:
-            self.get_error_rate = lambda: getattr(ERROR_RATE, '_value')
-
-        if hasattr(PASS_RATE, 'get'):
-            PASS_RATE.set(0)
-            self.get_pass_rate = PASS_RATE.get
-        else:
-            self.get_pass_rate = lambda: getattr(PASS_RATE, '_value')
-
-    def test_latency_endpoint(self):
+def test_latency_endpoint(self):
         """Test latency endpoint."""
         response = self.app.get('/latency')
         self.assertEqual(response.status_code, 200)
@@ -94,7 +79,6 @@ class TestCrud(unittest.TestCase):
         """Test add endpoint with mocked database connection."""
         mock_cursor = MagicMock()
         mock_db_connection.cursor.return_value.__enter__.return_value = mock_cursor
-        # mock_db_connection.return_value.cursor.return_value.__enter__.return_value = MagicMock()
         response = self.app.post('/add', json={"item_id": 1, "data": 15})
         self.assertEqual(response.status_code, 201)
         self.assertIn(b'Added', response.data)
