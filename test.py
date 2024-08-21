@@ -14,7 +14,7 @@ class TestCrud(unittest.TestCase):
         self.get_error_rate = lambda:ERROR_RATE._value.get()
         self.get_pass_rate = lambda:PASS_RATE._value.get()
 
-def test_latency_endpoint(self):
+    def test_latency_endpoint(self):
         """Test latency endpoint."""
         response = self.app.get('/latency')
         self.assertEqual(response.status_code, 200)
