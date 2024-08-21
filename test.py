@@ -62,7 +62,7 @@ class TestCrud(unittest.TestCase):
             (1, 'sample data')]
         response = self.app.get('/get')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json(), [(1, 'sample data')])
+        self.assertEqual(response.get_json(), [(1, 16)])
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
         self.assertEqual(PASS_RATE._value.get(), 1)
 
