@@ -56,7 +56,9 @@ def error_endpoint():
     """Endpoint for Prometheus metrics."""
     REQUEST_COUNT.inc()
     ERROR_RATE.inc()
-    return jsonify({"message": "Database error occurred"}), 500
+    response = jsonify({"message": "Database error occurred"})
+    response.status_code = 500
+    return response
 
 
 @app.route("/latency", methods=["GET"])
