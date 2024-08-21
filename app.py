@@ -163,14 +163,14 @@ def add():
 
 
 @app.route("/put/<int:id>", methods=["PUT"])
-def modify(id):
+def modify(ids):
     REQUEST_COUNT.inc()
     x = request.get_json()
     try:
         conn = db_connection()
         with conn.cursor() as cur:
             cur.execute("UPDATE docker SET data = %s WHERE id = %s",
-                        (x["data"], id))
+                        (x["data"], ids))
         conn.commit()
         PASS_RATE.inc()
         return jsonify({"message": "Modified"}), 200
@@ -180,12 +180,12 @@ def modify(id):
         return jsonify({"error": "Database error occurred"}), 500
 
 @app.route("/delete/<int:id>", methods=["DELETE"])
-def delete(id):
+def delete(ids):
     REQUEST_COUNT.inc()
     try:
         conn = db_connection()
         with conn.cursor() as cur:
-            cur.execute("DELETE FROM docker WHERE id = %s", (id,))
+            cur.execute("DELETE FROM docker WHERE id = %s", (ids,))
         conn.commit()
         PASS_RATE.inc()
         return jsonify({"message": "Deleted"}), 200
