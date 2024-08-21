@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from app import app, REQUEST_COUNT, ERROR_RATE, PASS_RATE, REQUEST_LATENCY, REGISTRY
+from app import app, REQUEST_COUNT, ERROR_RATE, PASS_RATE
 
 class TestCrud(unittest.TestCase):
     def setUp(self):
@@ -11,7 +11,6 @@ class TestCrud(unittest.TestCase):
             REQUEST_COUNT._value.set(0)
             ERROR_RATE._value.set(0)
             PASS_RATE._value.set(0)
-
 
     def test_latency_endpoint(self):
         response = self.app.get('/latency')
@@ -33,6 +32,7 @@ class TestCrud(unittest.TestCase):
         self.assertIn(b'End after 2sec', response.data)
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
         self.assertEqual(PASS_RATE._value.get(), 1)
+
     def test_timeout5_endpoint(self):
         response = self.app.get('/timeout5')
         self.assertEqual(response.status_code, 200)
