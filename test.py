@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from app import app, REQUEST_COUNT, ERROR_RATE, PASS_RATE
 
+
 class TestCrud(unittest.TestCase):
     """Test case for CRUD operations and metrics endpoints."""
     def setUp(self):
@@ -9,10 +10,24 @@ class TestCrud(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-        with app.app_context():
-            REQUEST_COUNT._value.set(0)
-            ERROR_RATE._value.set(0)
-            PASS_RATE._value.set(0)
+        # Access metrics through public getters (if available)
+        if hasattr(REQUEST_COUNT, 'get'):
+            REQUEST_COUNT.set(0)  # Assuming a public set method exists
+            self.reset_metric = REQUEST_COUNT.get
+        else:
+            self.reset_metric = lambda: setattr(REQUEST_COUNT, '_value', 0)
+
+        if hasattr(ERROR_RATE, 'get'):
+            ERROR_RATE.set(0)
+            self.get_error_rate = ERROR_RATE.get
+        else:
+            self.get_error_rate = lambda: getattr(ERROR_RATE, '_value')
+
+        if hasattr(PASS_RATE, 'get'):
+            PASS_RATE.set(0)
+            self.get_pass_rate = PASS_RATE.get
+        else:
+            self.get_pass_rate = lambda: getattr(PASS_RATE, '_value')
 
     def test_latency_endpoint(self):
         """Test latency endpoint."""
@@ -20,7 +35,6 @@ class TestCrud(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Latency endpoint', response.data)
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
-
 
     def test_error_endpoint(self):
         """Test error endpoint."""
@@ -89,6 +103,7 @@ class TestCrud(unittest.TestCase):
         self.assertIn(b'Added', response.data)
         self.assertEqual(REQUEST_COUNT._value.get(), 1)
         self.assertEqual(PASS_RATE._value.get(), 1)
+
 
 if __name__ == '__main__':
     unittest.main()
