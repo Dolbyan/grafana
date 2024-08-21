@@ -181,6 +181,7 @@ def modify(ids):
         print("Error:", e)
         return jsonify({"error": "Database error occurred"}), 500
 
+
 @app.route("/delete/<int:id>", methods=["DELETE"])
 def delete(ids):
     REQUEST_COUNT.inc()
