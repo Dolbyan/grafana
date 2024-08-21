@@ -5,13 +5,35 @@ from flask import Flask, request, jsonify
 from prometheus_client import Summary, Counter, generate_latest, CollectorRegistry, Histogram
 app = Flask(__name__)
 
-REQUEST_LATENCY_2MS = Summary('request_latency2ms_seconds', 'Latency of HTTP method in seconds')
-REQUEST_LATENCY_2S = Summary('request_latency2s_seconds', 'Latency of HTTP method in seconds')
-REQUEST_LATENCY_5S = Summary('request_latency5s_seconds', 'Latency of HTTP method in seconds')
-REQUEST_LATENCY = Histogram('request_latency_seconds', 'Latency of HTTP requests in seconds', buckets=[0.5, 1, 2, 3, 5, 10])
-ERROR_RATE = Counter("error_rate", "Total number of errors")
-PASS_RATE = Counter("pass_rate", "Total number of successful requests")
-REQUEST_COUNT = Counter('request_count', 'Total number of HTTP requests')
+REQUEST_LATENCY_2MS = Summary(
+    'request_latency2ms_seconds',
+    'Latency of HTTP method in seconds'
+)
+REQUEST_LATENCY_2S = Summary(
+    'request_latency2s_seconds',
+    'Latency of HTTP method in seconds'
+)
+REQUEST_LATENCY_5S = Summary(
+    'request_latency5s_seconds',
+    'Latency of HTTP method in seconds'
+)
+REQUEST_LATENCY = Histogram(
+    'request_latency_seconds',
+    'Latency of HTTP requests in seconds',
+    buckets=[0.5, 1, 2, 3, 5, 10]
+)
+ERROR_RATE = Counter(
+    "error_rate",
+    "Total number of errors"
+)
+PASS_RATE = Counter(
+    "pass_rate",
+    "Total number of successful requests"
+)
+REQUEST_COUNT = Counter(
+    'request_count',
+    'Total number of HTTP requests'
+)
 
 REGISTRY = CollectorRegistry()
 REGISTRY.register(REQUEST_LATENCY_2MS)
@@ -25,11 +47,13 @@ REGISTRY.register(ERROR_RATE)
 
 @app.route("/metrics")
 def metrics():
+    """Endpoint for Prometheus metrics."""
     return generate_latest(REGISTRY)
 
 
 @app.route("/error", methods=["GET"])
-def error():
+def error_endpoint():
+    """Endpoint for Prometheus metrics."""
     REQUEST_COUNT.inc()
     ERROR_RATE.inc()
     return jsonify({"message": "Database error occurred"}), 500
@@ -37,6 +61,7 @@ def error():
 
 @app.route("/latency", methods=["GET"])
 def latency():
+    """Simulate latency."""
     REQUEST_COUNT.inc()
     start = time.time()
     time.sleep(1)
@@ -47,6 +72,7 @@ def latency():
 
 @app.route("/timeout", methods=["GET"])
 def timeout():
+    """Simulate a 2-second timeout."""
     REQUEST_COUNT.inc()
     start = time.time()
     try:
@@ -62,6 +88,7 @@ def timeout():
 
 @app.route("/timeout5", methods=["GET"])
 def timeout_5():
+    """Simulate a 5-second timeout."""
     REQUEST_COUNT.inc()
     start = time.time()
     try:
@@ -78,6 +105,7 @@ def timeout_5():
 
 @app.route("/mstimeout", methods=["GET"])
 def ms_timeout():
+    """Simulate a 200ms timeout."""
     REQUEST_COUNT.inc()
     start = time.time()
     time.sleep(0.2)
@@ -88,6 +116,7 @@ def ms_timeout():
 
 
 def db_connection():
+    """Create a connection to the database."""
     conn = psycopg2.connect(
         host=os.getenv("DB_HOST", "host.docker.internal"),
         database=os.getenv("DB_NAME", "microservices"),
@@ -99,6 +128,7 @@ def db_connection():
 
 @app.route("/get", methods=["GET"])
 def get():
+    """Retrieve data from the database."""
     REQUEST_COUNT.inc()
     try:
         conn = db_connection()
@@ -107,14 +137,15 @@ def get():
             data = cur.fetchall()
         PASS_RATE.inc()
         return jsonify(data), 200
-    except (Exception, psycopg2.Error) as error:
+    except psycopg2.Error as e:
         ERROR_RATE.inc()
-        print("Error fetching data from database", error)
+        print("Error:", e)
         return jsonify({"error": "Database error occurred"}), 500
 
 
 @app.route("/add", methods=["POST"])
 def add():
+    """Add data to the database."""
     REQUEST_COUNT.inc()
     x = request.get_json()
     try:
@@ -125,9 +156,9 @@ def add():
         conn.commit()
         PASS_RATE.inc()
         return jsonify({"message": "Added"}), 201
-    except (Exception, psycopg2.Error) as error:
+    except psycopg2.Error as e:
         ERROR_RATE.inc()
-        print("Error adding data to database", error)
+        print("Error:", e)
         return jsonify({"error": "Database error occurred"}), 500
 
 
@@ -143,9 +174,9 @@ def modify(id):
         conn.commit()
         PASS_RATE.inc()
         return jsonify({"message": "Modified"}), 200
-    except (Exception, psycopg2.Error) as error:
+    except psycopg2.Error as e:
         ERROR_RATE.inc()
-        print("Error modifying data in database", error)
+        print("Error:", e)
         return jsonify({"error": "Database error occurred"}), 500
 
 @app.route("/delete/<int:id>", methods=["DELETE"])
@@ -158,13 +189,11 @@ def delete(id):
         conn.commit()
         PASS_RATE.inc()
         return jsonify({"message": "Deleted"}), 200
-    except (Exception, psycopg2.Error) as error:
+    except (Exception, psycopg2.Error) as e:
         ERROR_RATE.inc()
-        print("Error deleting data from database", error)
+        print("Error deleting data from database", e)
         return jsonify({"error": "Database error occurred"}), 500
-
 
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
-
