@@ -66,9 +66,12 @@ class TestCrud(unittest.TestCase):
     @patch("app.db_connection")
     def test_get_endpoint(self, mock_db_connection):
         """Test get endpoint with mocked database connection."""
-        mock_db_connection.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = [
-            (1, 16)
-        ]
+        mock_cursor = MagicMock()
+        mock_cursor.fetchall.return_value = [(1, 16)]
+        mock_db_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        # mock_db_connection.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = [
+        #     (1, 16)
+        # ]
         response = self.app.get('/get')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), [[1, 16]])
@@ -78,7 +81,9 @@ class TestCrud(unittest.TestCase):
     @patch("app.db_connection")
     def test_add_endpoint(self, mock_db_connection):
         """Test add endpoint with mocked database connection."""
-        mock_db_connection.return_value.cursor.return_value.__enter__.return_value = MagicMock()
+        mock_cursor = MagicMock()
+        mock_db_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        # mock_db_connection.return_value.cursor.return_value.__enter__.return_value = MagicMock()
         response = self.app.post('/add', json={"item_id": 1, "data": 15})
         self.assertEqual(response.status_code, 201)
         self.assertIn(b'Added', response.data)
