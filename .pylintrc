@@ -12,3 +12,6 @@ max-args=5
 
 [REPORTS]
 output-format=parseable
+
+[MESSAGES CONTROL]
+disable=invalid-name
