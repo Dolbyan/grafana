@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, MagicMock
+# from unittest.mock import patch, MagicMock
 from app import app, REQUEST_COUNT, ERROR_RATE, PASS_RATE
 
 
