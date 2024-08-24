@@ -63,5 +63,22 @@ jobs:
         context: .
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/grafana:latest
-            
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+    - name: Deploy Docker image to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
+          docker pull ${{ secrets.DOCKER_USERNAME }}/grafana:latest
+          docker stop my-app || true  # Zatrzymaj poprzednią wersję aplikacji, jeśli działa
+          docker rm my-app || true    # Usuń poprzedni kontener
+          docker run -d -p 80:80 -p 3000:3000 -p 9090:9090 --name my-app ${{ secrets.DOCKER_USERNAME }}/grafana:latest
+        EOF
 
