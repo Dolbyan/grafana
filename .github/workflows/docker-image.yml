@@ -77,8 +77,8 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
           docker pull ${{ secrets.DOCKER_USERNAME }}/grafana:latest
-          docker stop my-app || true  # Zatrzymaj poprzednią wersję aplikacji, jeśli działa
-          docker rm my-app || true    # Usuń poprzedni kontener
+          docker stop my-app || true 
+          docker rm my-app || true 
           docker run -d -p 80:80 -p 3000:3000 -p 9090:9090 --name my-app ${{ secrets.DOCKER_USERNAME }}/grafana:latest
         EOF
 
