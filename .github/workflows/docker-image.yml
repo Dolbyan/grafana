@@ -151,10 +151,10 @@ jobs:
     - name: Apply Kubernetes manifests
       run: |
         ssh -o StrictHostKeyChecking=no -t ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
-          kubectl apply -f ./flask-app-deployment.yaml --validate=false
-          kubectl apply -f ./flask-app-service.yaml
-          kubectl apply -f ./postgres-deployment.yaml
-          kubectl apply -f ./postgres-service.yaml
-          kubectl apply -f ./prometheus-deployment.yaml
-          kubectl apply -f ./prometheus-service.yaml
+          kubectl apply -f flask-app-deployment.yaml --validate=false
+          kubectl apply -f flask-app-service.yaml
+          kubectl apply -f postgres-deployment.yaml
+          kubectl apply -f postgres-service.yaml
+          kubectl apply -f prometheus-deployment.yaml
+          kubectl apply -f prometheus-service.yaml
         EOF
