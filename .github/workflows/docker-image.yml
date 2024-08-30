@@ -75,6 +75,14 @@ jobs:
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+    - name: Copy Kubernetes manifests to EC2
+      run: |
+        scp -o StrictHostKeyChecking=no flask-app-deployment.yaml ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }}:/path/to/deploy/
+        scp -o StrictHostKeyChecking=no flask-app-service.yaml ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }}:/path/to/deploy/
+        scp -o StrictHostKeyChecking=no postgres-deployment.yaml ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }}:/path/to/deploy/
+        scp -o StrictHostKeyChecking=no postgres-service.yaml ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }}:/path/to/deploy/
+        scp -o StrictHostKeyChecking=no prometheus-deployment.yaml ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }}:/path/to/deploy/
+        scp -o StrictHostKeyChecking=no prometheus-service.yaml ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }}:/path/to/deploy/
     - name: Deploy Docker image to EC2 and configure kubectl
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
