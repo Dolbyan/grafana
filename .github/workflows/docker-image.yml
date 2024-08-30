@@ -72,6 +72,10 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
+    - name: List files in repository
+      run: |
+        ls -l
+
     - name: Create Kubernetes manifests directory on EC2
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
