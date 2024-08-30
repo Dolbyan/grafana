@@ -82,3 +82,20 @@ jobs:
           sudo docker run -d -p 80:80 -p 3000:3000 -p 9090:9090 --name my-app ${{ secrets.DOCKER_USERNAME }}/grafana:latest
         EOF
 
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v1
+      with:
+        kubectl-version: 'latest'
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+
+    - name: Apply Kubernetes manifests
+      run: |
+        kubectl apply -f flask-app-deployment.yaml
+        kubectl apply -f flask-app-service.yaml
+        kubectl apply -f postgres-deployment.yaml
+        kubectl apply -f postgres-service.yaml
+        kubectl apply -f prometheus-deployment.yaml
+        kubectl apply -f prometheus-service.yaml
