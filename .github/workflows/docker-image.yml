@@ -72,14 +72,6 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v1
-      with:
-        kubectl-version: 'latest'
-
-    - name: Configure kubectl
-      run: |
-        echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
 
     - name: List files in repository
       run: |
@@ -107,6 +99,15 @@ jobs:
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
         EOF
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v1
+      with:
+        kubectl-version: 'latest'
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
 
 
     - name: Apply Kubernetes manifests
