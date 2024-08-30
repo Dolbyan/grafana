@@ -102,7 +102,7 @@ jobs:
 
     - name: Apply Kubernetes manifests
       run: |
-        kubectl apply -f flask-app-deployment.yaml
+        kubectl apply -f flask-app-deployment.yaml --validate=false
         kubectl apply -f flask-app-service.yaml
         kubectl apply -f postgres-deployment.yaml
         kubectl apply -f postgres-service.yaml
