@@ -12,12 +12,12 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      
+
     - name: Set up Node.js 20
       uses: actions/setup-node@v3
       with:
         node-version: '20'
-      
+
     - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
@@ -31,12 +31,11 @@ jobs:
     - name: Run Pylint
       run: |
         pylint **/*.py
+
     - name: Run unit tests
       run: |
         python -m unittest test.py
 
-
-  
   build:
     runs-on: ubuntu-latest
     steps:
@@ -47,7 +46,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '20'
-    
+
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
@@ -68,49 +67,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
     - name: Set up SSH key
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
-#    - name: Deploy Docker image to EC2 and configure kubectl
-#      run: |
-#        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
-#          # Install kubectl
-#          curl -LO "https://dl.k8s.io/release/v1.26.0/bin/linux/amd64/kubectl"
-#          chmod +x ./kubectl
-#          sudo mv ./kubectl /usr/local/bin/kubectl
-#
-#          # Pull and run Docker image
-#          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/grafana:latest
-#          sudo docker stop my-app || true
-#          sudo docker rm my-app || true
-#          sudo docker run -d -p 80:80 -p 3000:3000 -p 9090:9090 --name my-app ${{ secrets.DOCKER_USERNAME }}/grafana:latest
-#
-#          # Set up kubectl
-#          mkdir -p $HOME/.kube
-#          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-#
-#          # Apply Kubernetes manifests
-#          kubectl apply -f flask-app-deployment.yaml --validate=false
-#          kubectl apply -f flask-app-service.yaml
-#          kubectl apply -f postgres-deployment.yaml
-#          kubectl apply -f postgres-service.yaml
-#          kubectl apply -f prometheus-deployment.yaml
-#          kubectl apply -f prometheus-service.yaml
-#        EOF
 
-#    - name: Deploy Docker image to EC2
-#      run: |
-#        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
-#          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/grafana:latest
-#          sudo docker stop my-app || true
-#          sudo docker rm my-app || true
-#          sudo docker run -d -p 80:80 -p 3000:3000 -p 9090:9090 --name my-app ${{ secrets.DOCKER_USERNAME }}/grafana:latest
-#        EOF
-#i tutaj działa
+    - name: Create Kubernetes manifests directory on EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
+          mkdir -p /home/ubuntu/kubernetes/manifests
+        EOF
+
+    - name: Upload Kubernetes manifests to EC2
+      run: |
+        scp -o StrictHostKeyChecking=no -r ./flask-app-deployment.yaml ./flask-app-service.yaml ./postgres-deployment.yaml ./postgres-service.yaml ./prometheus-deployment.yaml ./prometheus-service.yaml ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }}:/home/ubuntu/kubernetes/manifests
+
     - name: Deploy Docker image to EC2
       run: |
         ssh -o StrictHostKeyChecking=no -t ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
@@ -129,32 +100,17 @@ jobs:
       with:
         kubectl-version: 'latest'
 
-    - name: Create .kube directory
-      run: mkdir -p $HOME/.kube
-
     - name: Configure kubectl
       run: |
         echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-    - name: Configure Kubeconfig for Minikube
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-        EOF
-
-    - name: List files on EC2
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
-          ls -R
-        EOF
 
     - name: Apply Kubernetes manifests
       run: |
         ssh -o StrictHostKeyChecking=no -t ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
-          kubectl apply -f flask-app-deployment.yaml --validate=false
-          kubectl apply -f flask-app-service.yaml
-          kubectl apply -f postgres-deployment.yaml
-          kubectl apply -f postgres-service.yaml
-          kubectl apply -f prometheus-deployment.yaml
-          kubectl apply -f prometheus-service.yaml
+          kubectl apply -f /home/ubuntu/kubernetes/manifests/flask-app-deployment.yaml --validate=false
+          kubectl apply -f /home/ubuntu/kubernetes/manifests/flask-app-service.yaml
+          kubectl apply -f /home/ubuntu/kubernetes/manifests/postgres-deployment.yaml
+          kubectl apply -f /home/ubuntu/kubernetes/manifests/postgres-service.yaml
+          kubectl apply -f /home/ubuntu/kubernetes/manifests/prometheus-deployment.yaml
+          kubectl apply -f /home/ubuntu/kubernetes/manifests/prometheus-service.yaml
         EOF
