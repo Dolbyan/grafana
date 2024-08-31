@@ -75,7 +75,6 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-
     - name: Deploy Docker image to EC2
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
@@ -92,17 +91,32 @@ jobs:
           # Display kubeconfig for debugging
           cat $HOME/.kube/config
         EOF
+
     - name: Display kubeconfig content on EC2
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
           cat $HOME/.kube/config
         EOF
-    - name: Copy Kubernetes manifests to EC2
-      run: |
-        scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} -r ./kubernetes/ ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }}:/home/${{ secrets.EC2_USER }}/kubernetes/
-    - name: List files in Kubernetes directory on EC2
+
+    - name: Download Kubernetes manifests from GitHub to EC2
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.AWS_EC2_PUBLIC_IP }} << 'EOF'
+          # Install curl if not already installed
+          sudo apt-get update
+          sudo apt-get install -y curl
+
+          # Create the directory if it does not exist
+          mkdir -p /home/${{ secrets.EC2_USER }}/kubernetes
+
+          # Download Kubernetes manifests from GitHub repository
+          curl -LJO https://github.com/grafana/releases/latest/download/flask-app-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/flask-app-deployment.yaml
+          curl -LJO https://github.com/grafana/releases/latest/download/flask-app-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/flask-app-service.yaml
+          curl -LJO https://github.com/grafana/releases/latest/download/postgres-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/postgres-deployment.yaml
+          curl -LJO https://github.com/grafana/releases/latest/download/postgres-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/postgres-service.yaml
+          curl -LJO https://github.com/grafana/releases/latest/download/prometheus-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-deployment.yaml
+          curl -LJO https://github.com/grafana/releases/latest/download/prometheus-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-service.yaml
+
+          # List files to confirm download
           ls -R /home/${{ secrets.EC2_USER }}/kubernetes/
         EOF
 
@@ -116,3 +130,4 @@ jobs:
           kubectl apply -f /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-deployment.yaml
           kubectl apply -f /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-service.yaml
         EOF
+
