@@ -19,7 +19,7 @@ spec:
         - containerPort: 80
         env:
         - name: DB_HOST
-          value: "postgres-service"  # Kubernetes service name for PostgreSQL
+          value: "postgres-service"
         - name: DB_NAME
           value: "microservices"
         - name: DB_USER
