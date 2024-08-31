@@ -109,12 +109,12 @@ jobs:
           mkdir -p /home/${{ secrets.EC2_USER }}/kubernetes
 
           # Download Kubernetes manifests from GitHub repository
-          curl -LJO https://github.com/grafana/releases/latest/download/flask-app-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/flask-app-deployment.yaml
-          curl -LJO https://github.com/grafana/releases/latest/download/flask-app-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/flask-app-service.yaml
-          curl -LJO https://github.com/grafana/releases/latest/download/postgres-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/postgres-deployment.yaml
-          curl -LJO https://github.com/grafana/releases/latest/download/postgres-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/postgres-service.yaml
-          curl -LJO https://github.com/grafana/releases/latest/download/prometheus-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-deployment.yaml
-          curl -LJO https://github.com/grafana/releases/latest/download/prometheus-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-service.yaml
+          curl -LJO https://github.com/Dolbyan/grafana/blob/main/flask-app-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/flask-app-deployment.yaml
+          curl -LJO https://github.com/Dolbyan/grafana/blob/main/flask-app-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/flask-app-service.yaml
+          curl -LJO https://github.com/Dolbyan/grafana/blob/main/postgres-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/postgres-deployment.yaml
+          curl -LJO https://github.com/Dolbyan/grafana/blob/main/postgres-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/postgres-service.yaml
+          curl -LJO https://github.com/Dolbyan/grafana/blob/main/prometheus-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-deployment.yaml
+          curl -LJO https://github.com/Dolbyan/grafana/blob/main/prometheus-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-service.yaml
 
           # List files to confirm download
           ls -R /home/${{ secrets.EC2_USER }}/kubernetes/
