@@ -99,6 +99,7 @@ jobs:
           curl -LJO https://raw.githubusercontent.com/Dolbyan/grafana/main/postgres-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/postgres-service.yaml
           curl -LJO https://raw.githubusercontent.com/Dolbyan/grafana/main/prometheus-deployment.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-deployment.yaml
           curl -LJO https://raw.githubusercontent.com/Dolbyan/grafana/main/prometheus-service.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-service.yaml
+          curl -LJO https://raw.githubusercontent.com/Dolbyan/grafana/main/prometheus-config.yaml -o /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-config.yaml
 
           ls -R /home/${{ secrets.EC2_USER }}/kubernetes/
         EOF
@@ -112,4 +113,5 @@ jobs:
           kubectl apply -f /home/${{ secrets.EC2_USER }}/kubernetes/postgres-service.yaml
           kubectl apply -f /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-deployment.yaml
           kubectl apply -f /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-service.yaml
+          kubectl apply -f /home/${{ secrets.EC2_USER }}/kubernetes/prometheus-config.yaml
         EOF

@@ -2,12 +2,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-config
+  namespace: default
 data:
   prometheus.yml: |
     global:
       scrape_interval: 15s
-
     scrape_configs:
-      - job_name: 'prometheus'
+      - job_name: 'flask-app'
         static_configs:
-          - targets: ['localhost:9090']
+          - targets: ['flask-app-service:80']
